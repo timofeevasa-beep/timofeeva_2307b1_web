@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задачи</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; background: #f5f5f5; }
+        .task { background: white; margin: 20px 0; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .output { background: #e8f4f8; padding: 10px; border-radius: 5px; font-family: monospace; margin-top: 10px; }
+        hr { margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="task" id="task1">
+        <h3>Задача 1</h3>
+        <div id="t1-output" class="output"></div>
+    </div>
+    <div class="task" id="task2">
+        <h3>Задача 2</h3>
+        <div id="t2-output" class="output"></div>
+    </div>
+    <div class="task" id="task3">
+        <h3>Задача 3</h3>
+        <div id="t3-output" class="output"></div>
+        <hr>
+        <div id="t3-triplets" class="output"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Задача 1
+            const arr1 = [5, 12, 3, 8, 2, 12, 5, 9];
+            const maxDiff = Math.max(...arr1) - Math.min(...arr1);
+            
+            const uniqueArr = [...new Set(arr1)];
+            
+            const objectsArray = [
+                {id: 1, idDone: true}, 
+                {id: 2, idDone: false},
+                {id: 3, idDone: true}
+            ];
+            const doneObjects = objectsArray.filter(obj => obj.idDone === true);
+            
+            document.getElementById('t1-output').innerHTML = `
+                <strong>Исходный массив:</strong> [${arr1.join(', ')}]<br>
+                <strong>Максимальная разница:</strong> ${maxDiff}<br>
+                <strong>Массив без повторений:</strong> [${uniqueArr.join(', ')}]<br>
+                <strong>Объекты с isDone: true:</strong> ${JSON.stringify(doneObjects)}
+            `;
+            
+            // Задача 2
+            function filterGreaterThan(arr, num) {
+                return arr.filter(item => item > num);
+            }
+            
+            function flattenArray(arr) {
+                return arr.reduce((acc, val) => {
+                    return acc.concat(Array.isArray(val) ? flattenArray(val) : val);
+                }, []);
+            }
+            
+            const testArr2 = [1, 4, 6, 3, 2];
+            const filtered = filterGreaterThan(testArr2, 2);
+            
+            const nestedArr = [1, 4, [34, 1, 20], [6, [6, 12, 8], 6]];
+            const flat = flattenArray(nestedArr);
+            
+            document.getElementById('t2-output').innerHTML = `
+                <strong>filterGreaterThan([1,4,6,3,2], 2):</strong> [${filtered.join(', ')}]<br>
+                <strong>Плоский массив из [1,4,[34,1,20],[6,[6,12,8],6]]:</strong><br>
+                [${flat.join(', ')}]
+            `;
+            
+            // Задача 3
+            function countZeroSumPairs(arr) {
+                if (arr.length < 2) return 0;
+                let count = 0;
+                const used = new Array(arr.length).fill(false);
+                
+                for (let i = 0; i < arr.length; i++) {
+                    if (used[i]) continue;
+                    for (let j = i + 1; j < arr.length; j++) {
+                        if (used[j]) continue;
+                        if (arr[i] + arr[j] === 0) {
+                            count++;
+                            used[i] = true;
+                            used[j] = true;
+                            break;
+                        }
+                    }
+                }
+                return count;
+            }
+            
+            function countZeroSumTriplets(arr) {
+                if (arr.length < 3) return 0;
+                let count = 0;
+                const used = new Array(arr.length).fill(false);
+                
+                for (let i = 0; i < arr.length; i++) {
+                    if (used[i]) continue;
+                    for (let j = i + 1; j < arr.length; j++) {
+                        if (used[j]) continue;
+                        for (let k = j + 1; k < arr.length; k++) {
+                            if (used[k]) continue;
+                            if (arr[i] + arr[j] + arr[k] === 0) {
+                                count++;
+                                used[i] = true;
+                                used[j] = true;
+                                used[k] = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return count;
+            }
+            
+            const testPairs = [
+                {arr: [-7, 12, 4, 6, -4, -12, 0], expected: 2},
+                {arr: [-1, 2, 4, 7, -4, 1, -2], expected: 3},
+                {arr: [-1, 1, 0, 1], expected: 1},
+                {arr: [-1, 1, -1, 1], expected: 2},
+                {arr: [1, 1, 1, 0, -1], expected: 1},
+                {arr: [0, 0], expected: 1},
+                {arr: [], expected: 0}
+            ];
+            
+            const testTriplets = [
+                {arr: [-1, 0, 1, 2, -1, -4], expected: 2},
+                {arr: [0, 0, 0], expected: 1},
+                {arr: [-1, 2, -1, 0, 1], expected: 2},
+                {arr: [1, 2, -3, 0, 3, -2], expected: 2},
+                {arr: [-1, 1, 0], expected: 1},
+                {arr: [], expected: 0}
+            ];
+            
+            let pairsResult = '';
+            testPairs.forEach((test, idx) => {
+                const result = countZeroSumPairs(test.arr);
+                pairsResult += `f([${test.arr.join(', ')}]) -> ${result} (expected: ${test.expected})<br>`;
+            });
+            
+            let tripletsResult = '';
+            testTriplets.forEach((test, idx) => {
+                const result = countZeroSumTriplets(test.arr);
+                tripletsResult += `f([${test.arr.join(', ')}]) -> ${result} (expected: ${test.expected})<br>`;
+            });
+            
+            document.getElementById('t3-output').innerHTML = `
+                <strong>Количество пар, дающих в сумме 0:</strong><br>
+                ${pairsResult}
+            `;
+            
+            document.getElementById('t3-triplets').innerHTML = `
+                <strong>Количество троек, дающих в сумме 0:</strong><br>
+                ${tripletsResult}
+            `;
+        })();
+    </script>
+</body>
+</html>
