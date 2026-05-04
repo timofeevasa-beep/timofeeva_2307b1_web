@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Студия ландшафтного дизайна</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            color: #333;
+        }
+        
+        /* меню */
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 25px;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+        .nav-item {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+       
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 20px 0;
+        }
+        .title-block h1 {
+            font-size: 28px;
+            margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+        .title-block p {
+            font-size: 19px;
+            color: #707070;
+            margin: 0;
+        }
+        .contacts {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .phone {
+            font-size: 22px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .call-btn {
+            background: #ff8c42;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+        }
+        
+        /* 1 */
+.first-slide {
+    background-image: url('сад с фонтаном.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: rgb(255, 255, 255);
+    padding: 40px;
+    border-radius: 15px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.first-slide h1 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.first-slide p {
+    font-size: 18px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+/*отправить заявку*/
+.orange-btn {
+    background: #ff8c42;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    font-size: 18px;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+}
+        /* 2 СЛАЙД  */
+        .green-container {
+            background: #b6d11e;
+            border-radius: 15px;
+            padding: 50px;
+            margin: 30px 0;
+            color: white;
+        }
+        .green-flex {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .green-col {
+            flex: 1 1 250px;
+        }
+        .green-col h2 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 5px;
+            color: white;
+        }
+        .green-col p {
+            font-size: 15px;
+            line-height: 1.5;
+            opacity: 0.95;
+            margin-bottom: 0;
+        }
+        
+        /* 3 СЛАЙД  */
+        .horizontal-blocks {
+            display: flex;
+            gap: 25px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .horiz-item {
+            flex: 1 1 280px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .horiz-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d5a2d;
+            margin-bottom: 10px;
+        }
+        .horiz-desc {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+        .horiz-order {
+            background: #ff8c42;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            font-size: 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            border: 1px solid #ff8c42;
+            align-self: flex-start;
+            margin-top: auto;
+        }
+        .horiz-order:hover {
+            background: #e67a30;
+        }
+        
+
+        .about-section-white {
+            display: flex;
+            gap: 30px;
+            margin: 40px 0;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 0;
+            padding: 30px 0;
+            border: none;
+        }
+        .about-text-white {
+            flex: 1;
+        }
+        .about-text-white h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d5a2d;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .about-text-white p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 15px;
+        }
+        .about-image-white {
+            flex: 1;
+            text-align: center;
+        }
+        .about-image-white img {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+   
+        .why-block {
+            margin: 40px 0;
+        }
+        .why-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2d5a2d;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        .why-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .why-item {
+            flex: 0 0 calc(33.333% - 20px);
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .why-icon {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #ff8c42;
+        }
+        .why-item strong {
+            font-size: 18px;
+            color: #2d5a2d;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .why-item p {
+            margin: 0;
+            color: #555;
+            line-height: 1.4;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #777;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- меню -->
+    <div class="nav-menu">
+        <a href="#" class="nav-item">Главная</a>
+        <a href="#" class="nav-item">Услуги</a>
+        <a href="#" class="nav-item">О компании</a>
+        <a href="#" class="nav-item">Почему мы?</a>
+        <a href="#" class="nav-item">Акции</a>
+        <a href="#" class="nav-item">Как мы работаем</a>
+        <a href="#" class="nav-item">Отзывы</a>
+        <a href="#" class="nav-item">Консультации</a>
+        <a href="#" class="nav-item">Контакты</a>
+    </div>
+
+    <!-- шапка -->
+    <div class="header">
+        <div class="title-block">
+            <h1>Название компании</h1>
+            <p>Студия ландшафтного дизайна</p>
+        </div>
+        <div class="contacts">
+            <span class="phone">+7 (123) 123-45-67</span>
+            <span class="call-btn">Заказать звонок</span>
+        </div>
+    </div>
+
+    <!-- 1 СЛАЙД  -->
+    <div class="first-slide">
+        <h1>Разработка проекта ландшафтной организации участка со скидкой 50%.</h1>
+        <p>Мы можем осуществить Вашу мечту, а еще — помочь Вам выиграть подаренное карту на 5000 рублей!</p>
+        <button class="orange-btn">Отправить заявку</button>
+    </div>
+
+    <hr>
+
+    <!-- 2 СЛАЙД  -->
+    <div class="green-container">
+        <div class="green-flex">
+            <div class="green-col">
+                <h2>Ландшафтное проектирование</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+            </div>
+            <div class="green-col">
+                <h2>Благоустройство и озеленение</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+            </div>
+            <div class="green-col">
+                <h2>Автоматический полив</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- 3 СЛАЙД  -->
+    <div class="horizontal-blocks">
+    
+        <div class="horiz-item">
+            <div class="horiz-title">Ландшафтные проекты для дачи</div>
+            <div class="horiz-desc">🗸 Наши профессионалы помогут вам сделать все на высшем уровне ландшафтного дизайна.</div>
+            <button class="horiz-order">Заказать</button>
+        </div>
+
+     
+        <div class="horiz-item">
+            <div class="horiz-title">Посадка крупномеров, деревьев и кустарников</div>
+            <div class="horiz-desc">🗸 Наши деревья очень хорошо приживаются и создают атмосферу.</div>
+            <button class="horiz-order">Заказать</button>
+        </div>
+
+        
+        <div class="horiz-item">
+            <div class="horiz-title">Пруды, водоемы, мосты</div>
+            <div class="horiz-desc">🗸 Вода — это место отдыха.</div>
+            <button class="horiz-order">Заказать</button>
+        </div>
+    </div>
+
+    
+    <div class="about-section-white">
+        <div class="about-text-white">
+            <h2>О компании</h2>
+            <p>Ландшафт для нас - это больше, чем дизайн. Это планомерное и всеобъемлющее создание комфортной и практичной среды обитания.</p>
+            <p>К Вашим услугам мы готовы предложить: ландшафтное проектирование, консультирование, уход за садом, авторский надзор, комплексное дизайнерское оформление территории.</p>
+            <p>А так же комплекс наших услуг включает: создание зимних садов, фитодизайн интерьера, новогодние и праздничные оформления, озеленение офисов.</p>
+        </div>
+        <div class="about-image-white">
+            
+            <img src="сад.jpg" alt="Сад">
+        </div>
+    </div>
+
+  
+    <div class="why-block">
+        <h2 class="why-title">Почему именно мы?</h2>
+        <div class="why-grid">
+            <div class="why-item">
+                <div class="why-icon">⏱</div>
+                <strong>Креативность</strong>
+                <p>Следование самые актуальные тенденциям современного дизайна.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon">⏱</div>
+                <strong>Ассортимент</strong>
+                <p>Огромный набор материалов для оформления.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon">⏱</div>
+                <strong>Ценообразование</strong>
+                <p>Привлекательные цены и система накопительных скидок.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon">⏱</div>
+                <strong>Оперативность</strong>
+                <p>Вы можете быть уверены, что все будет сделано в максимально короткие сроки.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon">⏱</div>
+                <strong>Профессионализм</strong>
+                <p>У нас работают только опытные дизайнеры.</p>
+            </div>
+        </div>
+    </div>
+</head>
+<body>
+    <div class="container">
+        <!-- Карточка сада в японском стиле -->
+        <div class="japanese-card">
+            <div class="card-image"></div>
+            <div class="card-content">
+                <h1>Сад в японском стиле</h1>
+                <p>Ландшафт для нас — это больше, чем дизайн. Это планомерное и всеобъемлющее создание комфортной и практичной среды обитания. 
+                    К Вашим услугам мы готовы предложить: ландшафтное проектирование, консультирование, уход за садом, авторский надзор, комплексное дизайнерское оформление территории.</p>
+                <p>А так же комплекс наших услуг включает: создание зимних садов, фотодизайн интерьера, новогоднее и праздничное оформление, озеленение офисов.</p>
+                
+                <div class="price">
+                    <span class="price-label">Цена:</span>
+                    <span class="price-value">от 200 000 руб.</span>
+                </div>
+                
+                <button class="card-btn">Предоставить мне</button>
+            </div>
+        </div>
+</body>
+</html>
