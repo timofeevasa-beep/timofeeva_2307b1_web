@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: monospace;
+            background: #f0f0f0;
+            margin: 20px;
+            padding: 0;
+        }
+        .task {
+            background: white;
+            margin: 15px 0;
+            padding: 10px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .output {
+            background: #ecf0f1;
+            padding: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #2c3e50;
+            margin: 8px 0;
+        }
+        button {
+            background: #474747;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #575858;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="task">
+    <div class="task-title">Задача №1 - Переменные</div>
+    <div class="output" id="output1"></div>
+    <button onclick="runTask1()">Выполнить</button>
+</div>
+
+<div class="task">
+    <div class="task-title">Задача №2 - Сумма чисел</div>
+    <div class="output" id="output2"></div>
+    <button onclick="runTask2()">Выполнить</button>
+</div>
+
+<div class="task">
+    <div class="task-title">Задача №3 - Чётные числа от 2 до 10</div>
+    <div class="output" id="output3"></div>
+    <button onclick="runTask3()">Выполнить</button>
+</div>
+
+<div class="task">
+    <div class="task-title">Задача №4 - Цикл while с alert</div>
+    <div class="output" id="output4"></div>
+    <button onclick="runTask4()">Выполнить</button>
+</div>
+
+<div class="task">
+    <div class="task-title">Задача №5 - Ввод числа > 100</div>
+    <div class="output" id="output5"></div>
+    <button onclick="runTask5()">Выполнить</button>
+</div>
+
+<div class="task">
+    <div class="task-title">Задача №6 - Простые числа до 10</div>
+    <div class="output" id="output6"></div>
+    <button onclick="runTask6()">Выполнить</button>
+</div>
+
+<script>
+    function runTask1() {
+        let admin;
+        let name;
+        name = "Джон";
+        admin = name;
+        document.getElementById('output1').innerHTML = `admin = ${admin}`;
+    }
+
+    function runTask2() {
+        let a = Number(prompt("Первое число?", 1));
+        let b = Number(prompt("Второе число?", 2));
+        let sum = a + b;
+        document.getElementById('output2').innerHTML = `${a} + ${b} = ${sum}`;
+        console.log(sum);
+    }
+
+    function runTask3() {
+        let evenNumbers = [];
+        for (let i = 2; i <= 10; i += 2) {
+            evenNumbers.push(i);
+            console.log(i);
+        }
+        document.getElementById('output3').innerHTML = evenNumbers.join(', ');
+    }
+
+    function runTask4() {
+        let output4 = '';
+        let i = 0;
+        while (i < 3) {
+            output4 += `number ${i}!\n`;
+            alert(`number ${i}!`);
+            i++;
+        }
+        document.getElementById('output4').innerHTML = output4.replace(/\n/g, '<br>');
+    }
+
+    function runTask5() {
+        let result5 = '';
+        let number;
+        while (true) {
+            number = prompt("Введите число больше 100", 0);
+            
+            if (number === null) {
+                result5 = 'Пользователь нажал Отмена';
+                break;
+            }
+            number = Number(number);
+            
+            if (number > 100) {
+                result5 = `Введено число: ${number}`;
+                break;
+            } else {
+                result5 = `Число ${number} не больше 100, попробуйте снова`;
+            }
+        }
+        document.getElementById('output5').innerHTML = result5;
+    }
+
+    function runTask6() {
+        function findPrimes(n) {
+            let primes = [];
+            for (let i = 2; i <= n; i++) {
+                let isPrime = true;
+                for (let j = 2; j <= Math.sqrt(i); j++) {
+                    if (i % j === 0) {
+                        isPrime = false;
+                        break;
+                    }
+                }
+                if (isPrime) {
+                    primes.push(i);
+                    console.log(i);
+                }
+            }
+            return primes;
+        }
+        let primesResult = findPrimes(10);
+        document.getElementById('output6').innerHTML = primesResult.join(', ');
+    }
+
+    runTask1();
+    document.getElementById('output3').innerHTML = (() => {
+        let evenNumbers = [];
+        for (let i = 2; i <= 10; i += 2) {
+            evenNumbers.push(i);
+        }
+        return evenNumbers.join(', ');
+    })();
+    document.getElementById('output6').innerHTML = (() => {
+        let primes = [];
+        for (let i = 2; i <= 10; i++) {
+            let isPrime = true;
+            for (let j = 2; j <= Math.sqrt(i); j++) {
+                if (i % j === 0) { isPrime = false; break; }
+            }
+            if (isPrime) primes.push(i);
+        }
+        return primes.join(', ');
+    })();
+</script>
+
+</body>
+</html>
+```
