@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Простые задачи · числа и строки</title>
+</head>
+<body>
+    <div style="border-bottom: 1px solid #ccc; margin-bottom: 1rem; padding-bottom: 1rem;">
+        <h3>Задача 1 · работа с числами</h3>
+        
+        <div><strong>1.1 Перевернуть число:</strong> 
+            <input type="number" id="numReverseInput" value="123" style="width: 100px;">
+            <button onclick="taskReverseNumber()">перевернуть</button>
+            <span id="reverseResult"></span>
+        </div>
+        
+        <div style="margin-top: 8px;"><strong>1.2 Убрать повторы цифр:</strong> 
+            <input type="number" id="numUniqueDigitsInput" value="111333456" style="width: 140px;">
+            <button onclick="taskUniqueDigits()">убрать дубликаты</button>
+            <span id="uniqueDigitsResult"></span>
+        </div>
+        
+        <div style="margin-top: 8px;"><strong>1.3 Подсчёт вхождения цифры:</strong> 
+            <input type="number" id="numCountNumberInput" value="1355567" style="width: 120px;"> 
+            цифра: 
+            <input type="number" id="digitToCountInput" value="5" min="0" max="9" style="width: 50px;">
+            <button onclick="taskCountDigit()">посчитать</button>
+            <span id="countDigitResult"></span>
+        </div>
+        
+        <div style="margin-top: 8px;"><strong>1.4 Макс. последовательность (0 или 1) в двоичной записи:</strong> 
+            <input type="number" id="binarySeqInput" value="135" style="width: 120px;">
+            <button onclick="taskMaxBinaryRun()">найти длину</button>
+            <span id="binarySeqResult"></span>
+            <span id="binaryHint" style="color: gray; font-size: 0.85em;"></span>
+        </div>
+    </div>
+    
+    <div>
+        <h3>Задача 2 · строки и символы</h3>
+        
+        <div><strong>2.1 Первый неповторяющийся символ:</strong> 
+            <input type="text" id="firstNonRepeatedStr" value="фывфавыапрс" style="width: 200px;">
+            <button onclick="taskFirstNonRepeated()">найти</button>
+            <span id="firstNonRepeatedResult"></span>
+        </div>
+        
+        <div style="margin-top: 8px;"><strong>2.2 Генерация случайной строки (англ. буквы + цифры):</strong> 
+            длина: <input type="number" id="randomStrLength" value="5" min="1" max="30" style="width: 60px;">
+            <button onclick="taskGenerateRandomString()">сгенерировать</button>
+            <span id="randomStringResult"></span>
+        </div>
+        
+        <div style="margin-top: 8px;"><strong>2.3 Только уникальные символы (порядок сохранён):</strong> 
+            <input type="text" id="uniqueCharsStr" value="позволяеткопироватьтекстиз" style="width: 280px;">
+            <button onclick="taskUniqueChars()">уникальные</button>
+            <span id="uniqueCharsResult"></span>
+        </div>
+    </div>
+
+    <script>
+        function reverseNumber(n) {
+            let str = Math.abs(n).toString();
+            let reversed = str.split('').reverse().join('');
+            let result = parseInt(reversed, 10);
+            return n < 0 ? -result : result;
+        }
+        
+        function taskReverseNumber() {
+            let inputElem = document.getElementById('numReverseInput');
+            let value = parseInt(inputElem.value, 10);
+            if (isNaN(value)) value = 0;
+            let reversed = reverseNumber(value);
+            document.getElementById('reverseResult').innerText = reversed;
+        }
+        
+        function getUniqueDigitsOrdered(num) {
+            let str = Math.abs(num).toString();
+            let seen = new Set();
+            let resultDigits = [];
+            for (let ch of str) {
+                if (!seen.has(ch)) {
+                    seen.add(ch);
+                    resultDigits.push(ch);
+                }
+            }
+            return parseInt(resultDigits.join(''), 10);
+        }
+        
+        function taskUniqueDigits() {
+            let inputElem = document.getElementById('numUniqueDigitsInput');
+            let val = parseInt(inputElem.value, 10);
+            if (isNaN(val)) val = 0;
+            let uniqueNumber = getUniqueDigitsOrdered(val);
+            document.getElementById('uniqueDigitsResult').innerText = uniqueNumber;
+        }
+        
+        function countDigitInNumber(number, digit) {
+            let numStr = Math.abs(number).toString();
+            let digitChar = digit.toString();
+            let count = 0;
+            for (let ch of numStr) {
+                if (ch === digitChar) count++;
+            }
+            return count;
+        }
+        
+        function taskCountDigit() {
+            let numberElem = document.getElementById('numCountNumberInput');
+            let digitElem = document.getElementById('digitToCountInput');
+            let number = parseInt(numberElem.value, 10);
+            let digit = parseInt(digitElem.value, 10);
+            if (isNaN(number)) number = 0;
+            if (isNaN(digit) || digit < 0 || digit > 9) digit = 0;
+            let cnt = countDigitInNumber(number, digit);
+            document.getElementById('countDigitResult').innerText = cnt;
+        }
+        
+        function longestBinaryRun(number) {
+            let absNum = Math.abs(number);
+            let binaryStr = absNum.toString(2);
+            if (binaryStr.length === 0) return { maxRun: 0, binaryStr: '0' };
+            let maxRun = 1;
+            let currentRun = 1;
+            for (let i = 1; i < binaryStr.length; i++) {
+                if (binaryStr[i] === binaryStr[i-1]) {
+                    currentRun++;
+                    maxRun = Math.max(maxRun, currentRun);
+                } else {
+                    currentRun = 1;
+                }
+            }
+            return { maxRun, binaryStr };
+        }
+        
+        function taskMaxBinaryRun() {
+            let inputElem = document.getElementById('binarySeqInput');
+            let num = parseInt(inputElem.value, 10);
+            if (isNaN(num)) num = 0;
+            let { maxRun, binaryStr } = longestBinaryRun(num);
+            let hintSpan = document.getElementById('binaryHint');
+            hintSpan.innerText = ` (двоичная: ${binaryStr})`;
+            document.getElementById('binarySeqResult').innerText = maxRun;
+        }
+        
+        function firstNonRepeatingChar(str) {
+            if (!str) return null;
+            const freq = new Map();
+            for (let ch of str) {
+                freq.set(ch, (freq.get(ch) || 0) + 1);
+            }
+            for (let ch of str) {
+                if (freq.get(ch) === 1) {
+                    return ch;
+                }
+            }
+            return null;
+        }
+        
+        function taskFirstNonRepeated() {
+            let inputElem = document.getElementById('firstNonRepeatedStr');
+            let text = inputElem.value;
+            let resultChar = firstNonRepeatingChar(text);
+            let outSpan = document.getElementById('firstNonRepeatedResult');
+            if (resultChar === null) {
+                outSpan.innerText = 'нет неповторяющихся символов';
+            } else {
+                outSpan.innerText = resultChar;
+            }
+        }
+        
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * chars.length);
+                result += chars[randomIndex];
+            }
+            return result;
+        }
+        
+        function taskGenerateRandomString() {
+            let lenElem = document.getElementById('randomStrLength');
+            let length = parseInt(lenElem.value, 10);
+            if (isNaN(length) || length < 1) length = 1;
+            if (length > 200) length = 200;
+            let randomStr = generateRandomString(length);
+            document.getElementById('randomStringResult').innerText = randomStr;
+        }
+        
+        function uniqueCharactersPreserveOrder(str) {
+            let seen = new Set();
+            let result = [];
+            for (let ch of str) {
+                if (!seen.has(ch)) {
+                    seen.add(ch);
+                    result.push(ch);
+                }
+            }
+            return result.join('');
+        }
+        
+        function taskUniqueChars() {
+            let inputElem = document.getElementById('uniqueCharsStr');
+            let text = inputElem.value;
+            let uniqueStr = uniqueCharactersPreserveOrder(text);
+            document.getElementById('uniqueCharsResult').innerText = uniqueStr;
+        }
+    </script>
+</body>
+</html>
