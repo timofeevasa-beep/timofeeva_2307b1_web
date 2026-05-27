@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Погода в Новосибирске — интерактивная карусель прогнозов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a2a3a 0%, #0f1a24 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* главная карточка */
+        .weather-card {
+            max-width: 560px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 1.5rem 1rem 2rem 1rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        /* заголовок с городом и датой */
+        .city-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .city-name {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .city-name span {
+            background: rgba(255,215,120,0.2);
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: normal;
+            backdrop-filter: blur(4px);
+        }
+        .current-date {
+            color: #cfecf0;
+            font-size: 0.9rem;
+            margin-top: 6px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* карусель */
+        .carousel-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.5rem 0 0.8rem;
+        }
+
+        .carousel-btn {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            z-index: 15;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .carousel-btn:hover {
+            background: rgba(0, 0, 0, 0.75);
+            transform: scale(1.02);
+        }
+        .carousel-btn:active {
+            transform: scale(0.96);
+        }
+
+        .carousel-track-wrapper {
+            flex: 1;
+            overflow: hidden;
+            margin: 0 8px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            gap: 20px;
+        }
+
+        /*слайд — карточка дня */
+        .weather-slide {
+            flex: 0 0 calc(100% - 8px);
+            background: rgba(25, 45, 60, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 1.6rem 1rem;
+            text-align: center;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s;
+        }
+
+        .day-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FFE6A7;
+            margin-bottom: 8px;
+        }
+        .full-date {
+            font-size: 0.85rem;
+            color: #bdd4df;
+            letter-spacing: 0.3px;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed rgba(255,255,240,0.3);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .weather-icon {
+            font-size: 4.2rem;
+            margin: 0.5rem 0;
+        }
+        .temp-main {
+            font-size: 3.4rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            margin: 0.3rem 0;
+        }
+        .temp-main small {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        .feels-like {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 1.2rem;
+        }
+        .weather-desc {
+            background: rgba(0,0,0,0.4);
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            color: #e9f4ff;
+        }
+        .details-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            background: rgba(0,0,0,0.35);
+            border-radius: 44px;
+            padding: 12px 16px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            color: #EFF6FF;
+        }
+        .detail-item span:first-child {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .detail-item .label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        /* индикаторы dots */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 1.8rem;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,200,0.4);
+            border-radius: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .dot.active {
+            width: 28px;
+            background: #FFD966;
+            box-shadow: 0 0 6px #ffcd7e;
+        }
+
+        /* статус загрузки и ошибки */
+        .loading-state, .error-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: white;
+            background: rgba(0,0,0,0.4);
+            border-radius: 48px;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 42px;
+            height: 42px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #FFD966;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .retry-btn {
+            background: #ffb347;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 36px;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1.8rem;
+            color: #9bb3c2;
+        }
+        @media (max-width: 480px) {
+            .weather-card { padding: 1rem 0.8rem 1.5rem; }
+            .temp-main { font-size: 2.6rem; }
+            .day-name { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="weather-card" id="app">
+    <div class="city-header">
+        <div class="city-name">
+            📍 Новосибирск <span>Россия</span>
+        </div>
+        <div class="current-date" id="overallDate">загрузка прогноза...</div>
+    </div>
+
+    <div id="carouselArea">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <div>Получаем данные с Open-Meteo API 🌦️</div>
+            <div style="font-size:0.8rem; margin-top:8px;">Бесплатный прогноз, без ключа</div>
+        </div>
+    </div>
+    <footer>⛅ Прогноз на 5 дней | Данные: Open-Meteo (NOAA/GFS)</footer>
+</div>
+
+<script>
+    //координаты новосиба
+    const NOVOSIBIRSK_LAT = 55.0415;
+    const NOVOSIBIRSK_LON = 82.9346;
+    
+    const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${NOVOSIBIRSK_LAT}&longitude=${NOVOSIBIRSK_LON}&timezone=auto&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,windspeed_10m_max,relative_humidity_2m_max,weathercode,sunrise,sunset&current_weather=true&forecast_days=6`;
+    
+    function getWeatherDescription(code, isDay = true) {
+        const codes = {
+            0: "Ясно",
+            1: "В основном ясно",
+            2: "Переменная облачность",
+            3: "Пасмурно",
+            45: "Туман",
+            48: "Туман с изморозью",
+            51: "Морось слабая",
+            53: "Морось умеренная",
+            55: "Морось густая",
+            56: "Ледяная морось",
+            57: "Ледяная морось плотная",
+            61: "Небольшой дождь",
+            63: "Умеренный дождь",
+            65: "Сильный дождь",
+            66: "Ледяной дождь слабый",
+            67: "Ледяной дождь сильный",
+            71: "Небольшой снег",
+            73: "Умеренный снег",
+            75: "Сильный снег",
+            77: "Снежные зерна",
+            80: "Ливневый дождь слабый",
+            81: "Ливневый дождь умеренный",
+            82: "Сильный ливень",
+            85: "Снегопад слабый",
+            86: "Сильный снегопад",
+            95: "Гроза",
+            96: "Гроза с градом слабая",
+            99: "Гроза с градом сильная"
+        };
+        let desc = codes[code] || "Облачно";
+        if (code === 0) return "☀️ " + desc;
+        if (code === 1 || code === 2) return "⛅ " + desc;
+        if (code === 3) return "☁️ " + desc;
+        if ([45,48].includes(code)) return "🌫️ " + desc;
+        if ([51,53,55,56,57].includes(code)) return "🌧️ " + desc;
+        if ([61,63,65,66,67].includes(code)) return "🌧️ " + desc;
+        if ([71,73,75,77].includes(code)) return "❄️ " + desc;
+        if ([80,81,82].includes(code)) return "🌦️ " + desc;
+        if ([85,86].includes(code)) return "🌨️ " + desc;
+        if ([95,96,99].includes(code)) return "⛈️ " + desc;
+        return "🌥️ " + desc;
+    }
+
+    //функция для форматирования даты в "9 апреля, среда"
+    function formatDateDetailed(dateStr) {
+        const date = new Date(dateStr);
+        const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+        const weekdays = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const weekday = weekdays[date.getDay()];
+        return `${day} ${month}, ${weekday}`;
+    }
+
+    //HTML для слайда с детальным прогнозом
+    function renderSlide(dayData, index, currentPressure = null) {
+        const maxTemp = Math.round(dayData.temperature_max);
+        const minTemp = Math.round(dayData.temperature_min);
+        const feelsLike = Math.round(dayData.apparent_temp_max);
+        const windSpeed = dayData.windspeed_max ? dayData.windspeed_max.toFixed(1) : "—";
+        const humidity = dayData.humidity_max ? Math.round(dayData.humidity_max) : "—";
+        const weatherCode = dayData.weathercode;
+        const description = getWeatherDescription(weatherCode);
+        const sunriseShort = dayData.sunrise ? dayData.sunrise.split('T')[1]?.slice(0,5) : "—";
+        const sunsetShort = dayData.sunset ? dayData.sunset.split('T')[1]?.slice(0,5) : "—";
+        let pressureDisplay = "751";
+        if (currentPressure && index === 0) pressureDisplay = currentPressure;
+        else if (currentPressure) pressureDisplay = currentPressure;
+
+        return `
+            <div class="weather-slide">
+                <div class="day-name">${dayData.weekday || "День"}</div>
+                <div class="full-date">${dayData.formattedDate}</div>
+                <div class="weather-icon">${description.split(' ')[0]}</div>
+                <div class="temp-main">${maxTemp}<small>°</small> / ${minTemp}<small>°</small></div>
+                <div class="feels-like">Ощущается как ${feelsLike}°</div>
+                <div class="weather-desc">${description.replace(/^[^\s]+\s/, '')}</div>
+                <div class="details-grid">
+                    <div class="detail-item"><span>💨</span><span>${windSpeed} м/с</span><span class="label">Ветер</span></div>
+                    <div class="detail-item"><span>💧</span><span>${humidity}%</span><span class="label">Влажность</span></div>
+                    <div class="detail-item"><span>📅</span><span>${pressureDisplay} мм</span><span class="label">Давление</span></div>
+                    <div class="detail-item"><span>🌅</span><span>${sunriseShort}</span><span class="label">Восход</span></div>
+                    <div class="detail-item"><span>🌇</span><span>${sunsetShort}</span><span class="label">Закат</span></div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function loadWeather() {
+        const carouselContainer = document.getElementById('carouselArea');
+        carouselContainer.innerHTML = `<div class="loading-state"><div class="spinner"></div><div>Запрашиваем прогноз для Новосибирска 🌍</div></div>`;
+        
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error(`Ошибка HTTP ${response.status}`);
+            const data = await response.json();
+            
+            if (!data.daily || !data.daily.time || data.daily.time.length === 0) {
+                throw new Error("Не удалось получить прогноз");
+            }
+            
+            const daily = data.daily;
+            const timeArr = daily.time;
+            const tempMaxArr = daily.temperature_2m_max;
+            const tempMinArr = daily.temperature_2m_min;
+            const apparentMaxArr = daily.apparent_temperature_max;
+            const windMaxArr = daily.windspeed_10m_max;
+            const humidityMaxArr = daily.relative_humidity_2m_max;
+            const weatherCodes = daily.weathercode;
+            const sunriseArr = daily.sunrise || [];
+            const sunsetArr = daily.sunset || [];
+            
+            //получаем текущее давление из current_weather
+            let currentPressureMm = "751";
+            if (data.current_weather) {
+                try {
+                    const pressureUrl = `https://api.open-meteo.com/v1/forecast?latitude=${NOVOSIBIRSK_LAT}&longitude=${NOVOSIBIRSK_LON}&hourly=pressure_msl&forecast_days=1`;
+                    const pressRes = await fetch(pressureUrl);
+                    if(pressRes.ok) {
+                        const pressData = await pressRes.json();
+                        if(pressData.hourly && pressData.hourly.pressure_msl && pressData.hourly.pressure_msl.length){
+                            const avgPressure = pressData.hourly.pressure_msl.slice(0,12).reduce((a,b)=>a+b,0)/12;
+                            currentPressureMm = Math.round(avgPressure);
+                        }
+                    }
+                } catch(e) { console.warn("Не удалось получить давление, используем стандартное"); }
+            }
+            
+            //собираем массив дней
+            const totalDays = Math.min(timeArr.length, 6);
+            const forecastDays = [];
+            for (let i = 0; i < totalDays; i++) {
+                const dateStr = timeArr[i];
+                const formattedDate = formatDateDetailed(dateStr);
+                const weekdaysShort = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+                const dateObj = new Date(dateStr);
+                const weekday = weekdaysShort[dateObj.getDay()];
+                forecastDays.push({
+                    date: dateStr,
+                    formattedDate: formattedDate,
+                    weekday: weekday,
+                    temperature_max: tempMaxArr[i],
+                    temperature_min: tempMinArr[i],
+                    apparent_temp_max: apparentMaxArr[i],
+                    windspeed_max: windMaxArr[i],
+                    humidity_max: humidityMaxArr[i],
+                    weathercode: weatherCodes[i],
+                    sunrise: sunriseArr[i] || "",
+                    sunset: sunsetArr[i] || ""
+                });
+            }
+            
+            //рендер карусели с данными
+            buildCarousel(forecastDays, currentPressureMm);
+            //обновка шапки с сегодняшней датой
+            const todayDate = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('overallDate').innerHTML = `📌 ${todayDate.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year:'numeric' })} · Прогноз на 5 дней`;
+            
+        } catch (error) {
+            console.error(error);
+            carouselContainer.innerHTML = `<div class="error-state">
+                <div>⚠️ Ошибка загрузки погоды</div>
+                <div style="font-size:0.85rem; margin: 10px;">${error.message}</div>
+                <button class="retry-btn" onclick="location.reload()">⟳ Повторить</button>
+            </div>`;
+        }
+    }
+    
+    //карусель с динамическими слайдами и навигацией
+    function buildCarousel(forecastArray, pressureValue) {
+        const container = document.getElementById('carouselArea');
+        if (!forecastArray.length) {
+            container.innerHTML = '<div class="error-state">Не удалось получить прогноз</div>';
+            return;
+        }
+        
+        let currentIndex = 0;
+        const slidesCount = forecastArray.length;
+        
+        //генерируем слайды
+        const slidesHtml = forecastArray.map((day, idx) => {
+            return renderSlide(day, idx, pressureValue);
+        }).join('');
+        
+        const carouselHtml = `
+            <div class="carousel-container">
+                <button class="carousel-btn" id="prevBtn" aria-label="Предыдущий день">‹</button>
+                <div class="carousel-track-wrapper">
+                    <div class="carousel-track" id="carouselTrack">
+                        ${slidesHtml}
+                    </div>
+                </div>
+                <button class="carousel-btn" id="nextBtn" aria-label="Следующий день">›</button>
+            </div>
+            <div class="carousel-dots" id="carouselDots"></div>
+        `;
+        
+        container.innerHTML = carouselHtml;
+        
+        const track = document.getElementById('carouselTrack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('carouselDots');
+        
+        //точки-индикаторы
+        function updateDots() {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < slidesCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === currentIndex) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    currentIndex = i;
+                    updateCarousel();
+                });
+                dotsContainer.appendChild(dot);
+            }
+        }
+        
+        function updateCarousel() {
+            if (!track) return;
+            const slideWidthPercent = 100; // каждый слайд занимает 100% от wrapper (так как flex-basis:100% в css)
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            // обновляем активные точки
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+        
+        prevBtn?.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel();
+            }
+        });
+        
+        nextBtn?.addEventListener('click', () => {
+            if (currentIndex < slidesCount - 1) {
+                currentIndex++;
+                updateCarousel();
+            }
+        });
+        
+        updateDots();
+        updateCarousel();
+        
+        //свайп для мобильных
+        let touchStart = 0;
+        track?.parentElement?.addEventListener('touchstart', (e) => {
+            touchStart = e.changedTouches[0].screenX;
+        });
+        track?.parentElement?.addEventListener('touchend', (e) => {
+            const touchEnd = e.changedTouches[0].screenX;
+            if (touchEnd < touchStart - 40 && currentIndex < slidesCount-1) {
+                currentIndex++;
+                updateCarousel();
+            } else if (touchEnd > touchStart + 40 && currentIndex > 0) {
+                currentIndex--;
+                updateCarousel();
+            }
+        });
+    }
+    loadWeather();
+</script>
+</body>
+</html>
