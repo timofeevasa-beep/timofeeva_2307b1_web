@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задачи</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; background: #f5f5f5; }
+        .task { background: white; margin: 20px 0; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .output { background: #e8f4f8; padding: 10px; border-radius: 5px; font-family: monospace; margin-top: 10px; white-space: pre-wrap; }
+        hr { margin: 15px 0; }
+        button { margin: 5px; padding: 5px 10px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+        button:hover { background: #0056b3; }
+        .control-buttons { margin-top: 10px; }
+        input { padding: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="task" id="task1">
+        <h3>Задача 1 - Счётчик с таймерами</h3>
+        <div>
+            <button onclick="startCounter()">Старт</button>
+            <button onclick="pauseCounter()">Пауза</button>
+            <button onclick="stopCounter()">Стоп</button>
+            <button onclick="runSimpleCounter()">Простой счётчик (5→0)</button>
+        </div>
+        <div id="t1-output" class="output">Ожидание действий...</div>
+    </div>
+    
+    <div class="task" id="task2">
+        <h3>Задача 2 - Промисы</h3>
+        <div>
+            <button onclick="runDelayCounter()">Запустить счётчик через delay (5→0)</button>
+            <button onclick="getFirstRepoExample()">Получить первый репозиторий (octocat)</button>
+            <input type="text" id="username" placeholder="Введите имя пользователя GitHub" value="octocat">
+            <button onclick="getFirstRepoCustom()">Показать первый репозиторий</button>
+        </div>
+        <div id="t2-output" class="output">Ожидание действий...</div>
+    </div>
+    
+    <div class="task" id="task3">
+        <h3>Задача 3 - async/await</h3>
+        <div>
+            <button onclick="runGetGithubUser()">Поиск пользователя GitHub (с циклом)</button>
+        </div>
+        <div id="t3-output" class="output">Ожидание действий...</div>
+    </div>
+
+    <script>
+////////////////////////№1
+        
+        //простой счётчик
+        function counter(n) {
+            let current = n;
+            const intervalId = setInterval(() => {
+                addToOutput('t1-output', `counter: ${current}`);
+                console.log(current);
+                if (current === 0) {
+                    clearInterval(intervalId);
+                    addToOutput('t1-output', 'Счётчик остановлен');
+                }
+                current--;
+            }, 1000);
+        }
+        
+        //объект с методами start/pause/stop
+        let myCounter = null;
+        
+        function createCounter(n) {
+            let current = n;
+            let intervalId = null;
+            let isRunning = false;
+            
+            return {
+                start() {
+                    if (isRunning) return;
+                    if (current < 0) current = n;
+                    
+                    isRunning = true;
+                    addToOutput('t1-output', `Счётчик запущен с ${current}`);
+                    intervalId = setInterval(() => {
+                        addToOutput('t1-output', `${current}`);
+                        console.log(current);
+                        if (current === 0) {
+                            this.stop();
+                        }
+                        current--;
+                    }, 1000);
+                },
+                
+                pause() {
+                    if (intervalId) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        isRunning = false;
+                        addToOutput('t1-output', 'Счётчик приостановлен');
+                    }
+                },
+                
+                stop() {
+                    if (intervalId) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                    }
+                    current = n;
+                    isRunning = false;
+                    addToOutput('t1-output', 'Счётчик остановлен и сброшен');
+                }
+            };
+        }
+        
+        function startCounter() {
+            if (myCounter) {
+                myCounter.start();
+            } else {
+                myCounter = createCounter(5);
+                myCounter.start();
+            }
+        }
+        
+        function pauseCounter() {
+            if (myCounter) {
+                myCounter.pause();
+            }
+        }
+        
+        function stopCounter() {
+            if (myCounter) {
+                myCounter.stop();
+                myCounter = null;
+            }
+        }
+        
+        function runSimpleCounter() {
+            addToOutput('t1-output', 'Запуск простого счётчика (5→0):');
+            counter(5);
+        }
+        
+/////////////////////////////////////////№2
+        
+        // Функция delay
+        function delay(N) {
+            return new Promise(resolve => {
+                setTimeout(resolve, N * 1000);
+            });
+        }
+        
+        //счётчик через delay
+        async function counterWithDelay(n) {
+            addToOutput('t2-output', `Запуск счётчика через delay (${n}→0):`);
+            for (let i = n; i >= 0; i--) {
+                addToOutput('t2-output', `${i}`);
+                console.log(i);
+                await delay(1);
+            }
+            addToOutput('t2-output', 'Счётчик завершён');
+        }
+        
+        //функция для получения первого репозитория
+        async function getFirstRepo(username) {
+            addToOutput('t2-output', `Запрос информации о пользователе ${username}...`);
+            const userResponse = await fetch(`https://api.github.com/users/${username}`);
+            
+            if (!userResponse.ok) {
+                throw new Error(`Пользователь не найден: ${userResponse.status}`);
+            }
+            
+            const user = await userResponse.json();
+            addToOutput('t2-output', `Пользователь найден: ${user.login}, запрос репозиториев...`);
+            
+            const reposResponse = await fetch(user.repos_url);
+            
+            if (!reposResponse.ok) {
+                throw new Error(`Репозитории не найдены: ${reposResponse.status}`);
+            }
+            
+            const repos = await reposResponse.json();
+            
+            if (repos.length === 0) {
+                throw new Error('У пользователя нет репозиториев');
+            }
+            
+            return repos[0].name;
+        }
+        
+        async function getFirstRepoExample() {
+            try {
+                addToOutput('t2-output', '=== Получение первого репозитория octocat ===');
+                const repoName = await getFirstRepo('octocat');
+                addToOutput('t2-output', `Первый репозиторий: ${repoName}`);
+            } catch (error) {
+                addToOutput('t2-output', `Ошибка: ${error.message}`);
+            }
+        }
+        
+        async function getFirstRepoCustom() {
+            const username = document.getElementById('username').value;
+            try {
+                addToOutput('t2-output', `=== Получение первого репозитория ${username} ===`);
+                const repoName = await getFirstRepo(username);
+                addToOutput('t2-output', `Первый репозиторий: ${repoName}`);
+            } catch (error) {
+                addToOutput('t2-output', `Ошибка: ${error.message}`);
+            }
+        }
+        
+        function runDelayCounter() {
+            counterWithDelay(5);
+        }
+        
+//////////////////////////////////////№3
+        
+        class HttpError extends Error {
+            constructor(response) {
+                super(`${response.status} для ${response.url}`);
+                this.name = 'HttpError';
+                this.response = response;
+            }
+        }
+        
+        async function loadJson(url) {
+            const response = await fetch(url);
+            if (response.status == 200) {
+                return response.json();
+            } else {
+                throw new HttpError(response);
+            }
+        }
+        
+        //переписанная функция с использованием async/await и циклом вместо рекурсии
+        async function getGithubUser() {
+            while (true) {
+                let name = prompt("Введите логин пользователя GitHub:", "octocat");
+                
+                if (name === null) {
+                    addToOutput('t3-output', 'Поиск отменён пользователем');
+                    return null;
+                }
+                
+                try {
+                    addToOutput('t3-output', `Поиск пользователя: ${name}...`);
+                    const user = await loadJson(`https://api.github.com/users/${name}`);
+                    addToOutput('t3-output', `Найден пользователь! Полное имя: ${user.name || 'не указано'}`);
+                    alert(`Полное имя: ${user.name || 'не указано'}\nРепозиториев: ${user.public_repos}`);
+                    return user;
+                } catch (err) {
+                    if (err instanceof HttpError && err.response.status == 404) {
+                        addToOutput('t3-output', `Пользователь "${name}" не существует, повторите ввод`);
+                        alert("Такого пользователя не существует, пожалуйста, повторите ввод.");
+                        continue;
+                    } else {
+                        addToOutput('t3-output', `Ошибка: ${err.message}`);
+                        throw err;
+                    }
+                }
+            }
+        }
+        
+        async function runGetGithubUser() {
+            addToOutput('t3-output', '=== Запуск поиска пользователя GitHub ===');
+            try {
+                const user = await getGithubUser();
+                if (user) {
+                    addToOutput('t3-output', `Поиск завершён. Пользователь: ${user.login}`);
+                }
+            } catch (error) {
+                addToOutput('t3-output', `Фатальная ошибка: ${error.message}`);
+            }
+        }
+        
+        //функция для вывода в блоки
+        function addToOutput(elementId, message) {
+            const outputDiv = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const newLine = document.createElement('div');
+            newLine.textContent = `[${timestamp}] ${message}`;
+            outputDiv.appendChild(newLine);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+        
+        //очистка консоли
+        console.log('Страница загружена. Готов к выполнению задач!');
+    </script>
+</body>
+</html>
