@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список дел</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2f4f4f;
+            color: #333;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Input Section */
+        .input-section {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-create {
+            background-color: #d3d3d3;
+            color: #333;
+        }
+
+        .btn-create:hover {
+            background-color: #c0c0c0;
+        }
+
+        .btn-clear {
+            background-color: #b22222;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #8b0000;
+        }
+
+        /* Task List */
+        .task-list {
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            min-height: 200px;
+            flex: 1;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item.completed {
+            background-color: #808080;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #2f4f4f;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-text {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .task-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .btn-delete:hover {
+            color: #b22222;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+            padding: 20px 0;
+            border-top: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+        }
+
+        .filter-link {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .filter-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .filter-link.active {
+            font-weight: bold;
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Sort Section */
+        .sort-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .sort-dropdown {
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .sort-dropdown:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 18px;
+        }
+
+        /* Footer - прижат к низу */
+        footer {
+            margin-top: auto;
+            text-align: center;
+            color: white;
+            padding-top: 20px;
+            border-top: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Список дел</h1>
+        
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="Новый элемент списка">
+            <button class="btn btn-create" onclick="app.addTask()">Создать</button>
+            <button class="btn btn-clear" onclick="app.clearAll()">Очистить всё</button>
+        </div>
+
+        <div class="task-list" id="taskList">
+            <!-- Tasks will be rendered here -->
+        </div>
+
+        <div class="filter-section">
+            <a class="filter-link" data-filter="completed" onclick="app.setFilter('completed')">
+                Сделано (<span id="completedCount">0</span>)
+            </a>
+            <a class="filter-link" data-filter="active" onclick="app.setFilter('active')">
+                Не сделано (<span id="activeCount">0</span>)
+            </a>
+            <a class="filter-link active" data-filter="all" onclick="app.setFilter('all')">
+                Все (<span id="allCount">0</span>)
+            </a>
+        </div>
+
+        <div class="sort-section">
+            <select class="sort-dropdown" id="sortSelect" onchange="app.setSort(this.value)">
+                <option value="newest">Самые новые</option>
+                <option value="oldest">Самые старые</option>
+                <option value="az">А-Я</option>
+                <option value="za">Я-А</option>
+            </select>
+        </div>
+
+        <footer>
+            <p>Copyright ©</p>
+        </footer>
+    </div>
+
+    <script>
+        /**
+         * TaskManager - Класс для управления данными (Model)
+         */
+        class TaskManager {
+            constructor() {
+                this.tasks = [];
+                this.loadFromStorage();
+            }
+
+            addTask(text) {
+                const task = {
+                    id: Date.now(),
+                    text: text.trim(),
+                    completed: false,
+                    createdAt: new Date()
+                };
+                this.tasks.push(task);
+                this.saveToStorage();
+                return task;
+            }
+
+            deleteTask(id) {
+                this.tasks = this.tasks.filter(task => task.id !== id);
+                this.saveToStorage();
+            }
+
+            toggleTask(id) {
+                const task = this.tasks.find(task => task.id === id);
+                if (task) {
+                    task.completed = !task.completed;
+                    this.saveToStorage();
+                    return task;
+                }
+                return null;
+            }
+
+            clearAll() {
+                this.tasks = [];
+                this.saveToStorage();
+            }
+
+            getAllTasks() {
+                return [...this.tasks];
+            }
+
+            getFilteredTasks(filter) {
+                switch(filter) {
+                    case 'completed':
+                        return this.tasks.filter(task => task.completed);
+                    case 'active':
+                        return this.tasks.filter(task => !task.completed);
+                    default:
+                        return [...this.tasks];
+                }
+            }
+
+            getSortedTasks(tasks, sortType) {
+                const sorted = [...tasks];
+                switch(sortType) {
+                    case 'newest':
+                        return sorted.sort((a, b) => b.createdAt - a.createdAt);
+                    case 'oldest':
+                        return sorted.sort((a, b) => a.createdAt - b.createdAt);
+                    case 'az':
+                        return sorted.sort((a, b) => a.text.localeCompare(b.text, 'ru'));
+                    case 'za':
+                        return sorted.sort((a, b) => b.text.localeCompare(a.text, 'ru'));
+                    default:
+                        return sorted;
+                }
+            }
+
+            saveToStorage() {
+                const data = this.tasks.map(task => ({
+                    ...task,
+                    createdAt: task.createdAt.toISOString()
+                }));
+                localStorage.setItem('tasks', JSON.stringify(data));
+            }
+
+            loadFromStorage() {
+                const data = localStorage.getItem('tasks');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    this.tasks = parsed.map(task => ({
+                        ...task,
+                        createdAt: new Date(task.createdAt)
+                    }));
+                }
+            }
+
+            getStats() {
+                return {
+                    total: this.tasks.length,
+                    completed: this.tasks.filter(t => t.completed).length,
+                    active: this.tasks.filter(t => !t.completed).length
+                };
+            }
+        }
+
+        /**
+         * TaskView - Класс для отображения (View)
+         */
+        class TaskView {
+            constructor() {
+                this.taskListElement = document.getElementById('taskList');
+            }
+
+            render(tasks) {
+                if (tasks.length === 0) {
+                    this.taskListElement.innerHTML = `
+                        <div class="empty-state">
+                            ${this.getEmptyMessage()}
+                        </div>
+                    `;
+                    return;
+                }
+
+                this.taskListElement.innerHTML = tasks.map(task => this.renderTask(task)).join('');
+                this.attachEventListeners();
+            }
+
+            renderTask(task) {
+                const dateStr = this.formatDate(task.createdAt);
+                return `
+                    <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                        <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''}>
+                        <div class="task-content">
+                            <div class="task-text">${this.escapeHtml(task.text)}</div>
+                            <div class="task-date">от ${dateStr}</div>
+                        </div>
+                        <button class="btn-delete">×</button>
+                    </div>
+                `;
+            }
+
+            updateStats(stats) {
+                document.getElementById('completedCount').textContent = stats.completed;
+                document.getElementById('activeCount').textContent = stats.active;
+                document.getElementById('allCount').textContent = stats.total;
+            }
+
+            updateActiveFilter(filter) {
+                document.querySelectorAll('.filter-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.filter === filter) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            getEmptyMessage() {
+                const filter = document.querySelector('.filter-link.active')?.dataset.filter || 'all';
+                switch(filter) {
+                    case 'completed':
+                        return 'Нет выполненных задач';
+                    case 'active':
+                        return 'Нет активных задач. Отличная работа!';
+                    default:
+                        return 'Список дел пуст. Добавьте первую задачу!';
+                }
+            }
+
+            formatDate(date) {
+                return date.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            attachEventListeners() {
+                // Чекбоксы
+                this.taskListElement.querySelectorAll('.checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const taskId = this.getTaskIdFromElement(e.target);
+                        app.toggleTask(taskId);
+                    });
+                });
+
+                // Кнопки удаления
+                this.taskListElement.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const taskId = this.getTaskIdFromElement(e.target);
+                        app.deleteTask(taskId);
+                    });
+                });
+            }
+
+            getTaskIdFromElement(element) {
+                const taskItem = element.closest('.task-item');
+                return parseInt(taskItem.dataset.id);
+            }
+        }
+
+        /**
+         * App - Основной класс приложения (Controller)
+         */
+        class App {
+            constructor() {
+                this.taskManager = new TaskManager();
+                this.view = new TaskView();
+                this.currentFilter = 'all';
+                this.currentSort = 'newest';
+                
+                this.init();
+            }
+
+            init() {
+                this.render();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('taskInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.addTask();
+                    }
+                });
+            }
+
+            addTask() {
+                const input = document.getElementById('taskInput');
+                const text = input.value.trim();
+                
+                if (text) {
+                    this.taskManager.addTask(text);
+                    input.value = '';
+                    this.render();
+                }
+            }
+
+            deleteTask(id) {
+                this.taskManager.deleteTask(id);
+                this.render();
+            }
+
+            toggleTask(id) {
+                this.taskManager.toggleTask(id);
+                this.render();
+            }
+
+            clearAll() {
+                if (confirm('Вы уверены, что хотите удалить все задачи?')) {
+                    this.taskManager.clearAll();
+                    this.render();
+                }
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                this.view.updateActiveFilter(filter);
+                this.render();
+            }
+
+            setSort(sortType) {
+                this.currentSort = sortType;
+                this.render();
+            }
+
+            render() {
+                let tasks = this.taskManager.getFilteredTasks(this.currentFilter);
+                tasks = this.taskManager.getSortedTasks(tasks, this.currentSort);
+                
+                const stats = this.taskManager.getStats();
+                this.view.updateStats(stats);
+                this.view.render(tasks);
+            }
+        }
+
+        const app = new App();
+    </script>
+</body>
+</html>
